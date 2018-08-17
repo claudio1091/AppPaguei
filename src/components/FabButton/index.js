@@ -34,7 +34,7 @@ function FabButton(props) {
         }}
         onPress={() => props.navigation.navigate('BillsDetailScrn')}
       >
-        <View>
+        <View style={styles.fabIcon}>
           <Icon name="md-add" size={32} color="white" />
         </View>
       </TouchableNativeFeedback>

@@ -6,6 +6,8 @@ import {
 import moment from 'moment';
 import { TextInputMask } from 'react-native-masked-text';
 
+import firebase from 'react-native-firebase';
+
 import Button from '../components/Button';
 import Container from '../components/Container';
 import BillTypeButton from '../components/BillTypeButton';
@@ -93,6 +95,17 @@ export default class BillDetail extends Component {
         storagedValue.push(newBill);
 
         console.log(storagedValue);
+
+        AsyncStorage.getItem('USER_UID', (err, result) => {
+          const userUid = JSON.parse(result);
+          const billId = newBill.id;
+
+          firebase
+            .firestore()
+            .collection('users')
+            .doc(userUid.databaseId)
+            .update({ billId: newBill });
+        });
 
         AsyncStorage.setItem(
           STORAGE.BILLS,
