@@ -1,0 +1,13 @@
+export const STORAGE = {
+  BILL_TYPE: 'STORAGE_BILL_TYPE',
+  BILLS: 'STORAGE_BILLS',
+};
+
+export const THEME = {
+  BACKGROUND: '#E1F3FC',
+  PRIMARY: '#008FE0',
+  SECONDARY: '#00CDE9',
+  CANCEL: '#c62828',
+  FONT: '#222',
+  FONT_COLOR: '#FFF',
+};

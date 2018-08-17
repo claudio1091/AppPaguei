@@ -1,0 +1,34 @@
+{
+  "name": "PagueiApp",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "moment": "2.18.1",
+    "native-base": "^2.7.2",
+    "prop-types": "^15.6.2",
+    "react": "16.3.1",
+    "react-native": "0.55.4",
+    "react-native-masked-text": "^1.7.2",
+    "react-native-vector-icons": "^5.0.0",
+    "react-navigation": "^2.9.2"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.6",
+    "babel-jest": "23.4.2",
+    "babel-preset-react-native": "4.0.0",
+    "eslint": "^5.1.0",
+    "eslint-config-airbnb": "^17.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-react": "^7.10.0",
+    "jest": "23.5.0",
+    "react-test-renderer": "16.3.1"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}
