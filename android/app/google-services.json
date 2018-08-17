@@ -1,0 +1,74 @@
+{
+  "project_info": {
+    "project_number": "962112259348",
+    "firebase_url": "https://paguei-app.firebaseio.com",
+    "project_id": "paguei-app",
+    "storage_bucket": "paguei-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:962112259348:android:768a7a59c127dbc3",
+        "android_client_info": {
+          "package_name": "com.pagueiapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "962112259348-bdb2v1grev1b5fk3a1i7imofg5tb6akf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH_jbPBvJsW5NW7ScIs2_L1Tx3NCRZ1lk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:962112259348:android:ae971594e2af9eb5",
+        "android_client_info": {
+          "package_name": "com.yoombox.paguei"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "962112259348-bdb2v1grev1b5fk3a1i7imofg5tb6akf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH_jbPBvJsW5NW7ScIs2_L1Tx3NCRZ1lk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      },
+      "admob_app_id": "ca-app-pub-5398707650805959~8382146389"
+    }
+  ],
+  "configuration_version": "1"
+}
