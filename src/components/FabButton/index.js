@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
     height: Dimensions.get('window').width / 6,
     width: Dimensions.get('window').width / 6,
     borderRadius: Dimensions.get('window').width / 6,
-    backgroundColor: 'blue',
+    backgroundColor: '#0076DD',
     padding: 8,
     justifyContent: 'center',
     alignItems: 'center',

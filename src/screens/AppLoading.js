@@ -19,7 +19,9 @@ class AppLoading extends Component {
   // Fetch the token from storage then navigate to our appropriate place
   bootstrapAsync = async () => {
     try {
+      await AsyncStorage.clear();
       const userToken = await AsyncStorage.getItem('USER_TOKEN');
+      console.log(userToken);
 
       if (!userToken) {
         const FCM = firebase.messaging();
@@ -30,7 +32,6 @@ class AppLoading extends Component {
         console.log('default app user ->', uid);
         console.log('token ->', FcmToken);
 
-        await AsyncStorage.clear();
 
         await AsyncStorage.setItem(
           'USER_TOKEN',
