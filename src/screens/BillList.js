@@ -34,42 +34,6 @@ export default class BillList extends Component {
     didBlurSubscription = this.props.navigation.addListener('willFocus', () => _this.getFromStorage());
   }
 
-  componentDidMount() {
-    firebase
-      .auth()
-      .signInAnonymouslyAndRetrieveData()
-      .then((credential) => {
-        if (credential) {
-          console.log('default app user ->', credential.user.toJSON());
-        }
-
-        const FCM = firebase.messaging();
-        const ref = firebase.firestore().collection('users');
-
-        // requests permissions from the user
-        FCM.requestPermissions();
-
-        FCM.onMessage((payload) => {
-          console.log('On Message ->', payload);
-        });
-
-        FCM.getInitialNotification().then((payload) => {
-          console.log('Inicial Notification ->', payload);
-        });
-
-        // gets the device's push token
-        FCM.getToken().then((token) => {
-          // stores the token in the user's document
-          console.log('token ->', token);
-          firebase
-            .firestore()
-            .collection('bills')
-            .doc('notification')
-            .update({ pushToken: token });
-        });
-      });
-  }
-
   componentWillUnmount() {
     if (didBlurSubscription) {
       didBlurSubscription.remove();
@@ -108,13 +72,6 @@ export default class BillList extends Component {
     return (
       <Container>
         <Content>
-          <View
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-          >
-            <Text>Origin: {this.state.notification.origin}</Text>
-            <Text>Data: {JSON.stringify(this.state.notification.data)}</Text>
-          </View>
-
           <List>
             {bills.map(billObj => (
               <BillItemList
