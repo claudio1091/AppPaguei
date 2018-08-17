@@ -2,143 +2,54 @@ import React, { Component } from 'react';
 import {
   ActivityIndicator,
   AsyncStorage,
-  StatusBar,
   StyleSheet,
   View,
 } from 'react-native';
-
+import PropTypes from 'prop-types';
 import firebase from 'react-native-firebase';
 
 import { STORAGE } from '../constants';
 
-const CLEAR_STORAGE = true;
-
 class AppLoading extends Component {
   constructor(props) {
     super(props);
-    this._bootstrapAsync();
+    this.bootstrapAsync();
   }
 
   // Fetch the token from storage then navigate to our appropriate place
-  _bootstrapAsync = async () => {
-    const initialBillTypes = [
-      { name: 'ÁGUA', icon: 'ios-water' },
-      { name: 'ENERGIA', icon: 'ios-flash' },
-      { name: 'CELULAR', icon: 'ios-phone-portrait' },
-      { name: 'TRANSPORTE', icon: 'ios-bus' },
-    ];
-    const initialBills = [
-      {
-        id: Math.floor(Math.random() * 10000),
-        dueDate: new Date(),
-        description: 'Conta de Teste 01',
-        billType: { name: 'ÁGUA', icon: 'ios-water' },
-        value: 39.5,
-      },
-      {
-        id: Math.floor(Math.random() * 10000),
-        dueDate: new Date(),
-        description: 'Conta de Teste 02',
-        billType: { name: 'ENERGIA', icon: 'ios-flash' },
-        value: 159.32,
-      },
-    ];
-
+  bootstrapAsync = async () => {
     try {
-      await AsyncStorage.clear();
-      const userStoraged = await AsyncStorage.getItem('user');
+      const userToken = await AsyncStorage.getItem('USER_TOKEN');
 
-      const billTypeStoraged = await AsyncStorage.getItem(STORAGE.BILL_TYPE);
-      if (!billTypeStoraged) {
-        await AsyncStorage.setItem(
-          STORAGE.BILL_TYPE,
-          JSON.stringify(initialBillTypes),
-        );
-      }
-
-      if (!userStoraged) {
+      if (!userToken) {
+        const FCM = firebase.messaging();
         console.log('fetch user id');
 
-        firebase
-          .auth()
-          .signInAnonymouslyAndRetrieveData()
-          .then((credential) => {
-            if (credential) {
-              console.log('default app user ->', credential.user.toJSON());
-              const userUid = credential.user.uid;
+        const uid = await this.logInAnonymous();
+        const FcmToken = await FCM.getToken();
+        console.log('default app user ->', uid);
+        console.log('token ->', FcmToken);
 
-              firebase
-                .firestore()
-                .collection('users')
-                .add({ uid: userUid })
-                .then((dataInserted) => {
-                  console.log('add Firestore ->', dataInserted);
-                  console.log(dataInserted._documentPath._parts[1]);
-
-                  const databaseId = dataInserted._documentPath._parts[1];
-
-                  AsyncStorage.setItem(
-                    'USER_UID',
-                    JSON.stringify({ userUid, databaseId }),
-                  ).then(() => this.props.navigation.navigate('RootStack'));
-                });
-            }
-
-            return null;
-          });
-      }
-
-      /* firebase
-        .auth()
-        .signInAnonymouslyAndRetrieveData()
-        .then((credential) => {
-          if (credential) {
-            console.log('default app user ->', credential.user.toJSON());
-          }
-
-          const FCM = firebase.messaging();
-          const ref = firebase.firestore().collection('users');
-
-          // requests permissions from the user
-          FCM.requestPermissions();
-
-          FCM.onMessage((payload) => {
-            console.log('On Message ->', payload);
-          });
-
-          FCM.getInitialNotification().then((payload) => {
-            console.log('Inicial Notification ->', payload);
-          });
-
-          // gets the device's push token
-          FCM.getToken().then((token) => {
-            // stores the token in the user's document
-            console.log('token ->', token);
-            firebase
-              .firestore()
-              .collection('bills')
-              .doc('notification')
-              .update({ pushToken: token });
-          });
-        }); */
-
-      /* if (CLEAR_STORAGE) {
         await AsyncStorage.clear();
-      }
 
-      const billTypeStoraged = await AsyncStorage.getItem(STORAGE.BILL_TYPE);
-      if (!billTypeStoraged) {
         await AsyncStorage.setItem(
-          STORAGE.BILL_TYPE,
-          JSON.stringify(initialBillTypes),
+          'USER_TOKEN',
+          JSON.stringify({ token: FcmToken, createAt: new Date() }),
         );
       }
 
-      const billStoraged = await AsyncStorage.getItem(STORAGE.BILLS);
-      if (!billStoraged) {
-        console.log('persist in storage');
-        await AsyncStorage.setItem(STORAGE.BILLS, JSON.stringify(initialBills));
-      } */
+      const listBillType = await firebase
+        .firestore()
+        .collection('default')
+        .doc('billType')
+        .get();
+      console.log('firestore billType ->', listBillType);
+      await AsyncStorage.setItem(
+        STORAGE.BILL_TYPE,
+        JSON.stringify(listBillType),
+      );
+
+      this.props.navigation.navigate('RootStack');
     } catch (error) {
       console.log('error storage');
       console.log(error);
@@ -146,27 +57,8 @@ class AppLoading extends Component {
   };
 
   logInAnonymous = async () => {
-    firebase
-      .auth()
-      .signInAnonymouslyAndRetrieveData()
-      .then((credential) => {
-        if (credential) {
-          console.log('default app user ->', credential.user.toJSON());
-          return credential.user.uid;
-        }
-
-        return null;
-      });
-  };
-
-  backupUserUidFirestore = async (uid) => {
-    firebase
-      .firestore()
-      .collection('users')
-      .add({ uid })
-      .then((dataInserted) => {
-        console.log('add Firestore ->', dataInserted);
-      });
+    const credential = await firebase.auth().signInAnonymouslyAndRetrieveData();
+    return credential.user ? credential.user.uid || null : null;
   };
 
   // Render any loading content that you like here
@@ -188,5 +80,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
   },
 });
+
+AppLoading.propTypes = {
+  navigation: PropTypes.object.isRequired,
+};
 
 export default AppLoading;
