@@ -600,10 +600,6 @@ amdefine@>=0.0.4:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
 
-andlog@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/andlog/-/andlog-1.0.1.tgz#afc6512b6e809f5bba63c6646d8685ccead19f11"
-
 ansi-colors@^1.0.1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/ansi-colors/-/ansi-colors-1.1.0.tgz#6374b4dd5d4718ff3ce27a671a3b1cad077132a9"
@@ -1519,12 +1515,6 @@ big-integer@^1.6.7:
 blueimp-md5@^2.5.0:
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/blueimp-md5/-/blueimp-md5-2.10.0.tgz#02f0843921f90dca14f5b8920a38593201d6964d"
-
-bows@^1.6.0:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/bows/-/bows-1.7.0.tgz#a3598ed9cef61a7a0cab1a7240f291654865ec76"
-  dependencies:
-    andlog "^1.0.0"
 
 bplist-creator@0.0.7:
   version "0.0.7"
@@ -4925,14 +4915,13 @@ react-native-easy-grid@0.2.0:
   dependencies:
     lodash "^4.11.1"
 
-react-native-firebase@3.2.7:
-  version "3.2.7"
-  resolved "https://registry.yarnpkg.com/react-native-firebase/-/react-native-firebase-3.2.7.tgz#e439e40c8a6f382dff5f08ae313f917d0783c211"
+react-native-firebase@4.3.8:
+  version "4.3.8"
+  resolved "https://registry.yarnpkg.com/react-native-firebase/-/react-native-firebase-4.3.8.tgz#a425b260aca0b97cde023dd2556fc18d16a3b7b3"
   dependencies:
-    bows "^1.6.0"
     opencollective "^1.0.3"
     postinstall-build "^5.0.1"
-    prop-types "^15.6.0"
+    prop-types "^15.6.1"
 
 react-native-iphone-x-helper@^1.0.1:
   version "1.0.3"
