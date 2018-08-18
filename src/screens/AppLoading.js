@@ -19,7 +19,7 @@ class AppLoading extends Component {
   // Fetch the token from storage then navigate to our appropriate place
   bootstrapAsync = async () => {
     try {
-      await AsyncStorage.clear();
+      console.log('APP LOADING');
       const userToken = await AsyncStorage.getItem('USER_TOKEN');
       console.log(userToken);
 
@@ -32,7 +32,6 @@ class AppLoading extends Component {
         console.log('default app user ->', uid);
         console.log('token ->', FcmToken);
 
-
         await AsyncStorage.setItem(
           'USER_TOKEN',
           JSON.stringify({ token: FcmToken, createAt: new Date() }),
@@ -41,14 +40,16 @@ class AppLoading extends Component {
 
       const listBillType = await firebase
         .firestore()
-        .collection('default')
-        .doc('billType')
+        .collection('config')
+        .doc('default')
         .get();
-      console.log('firestore billType ->', listBillType);
+      console.log('firestore billType ->', listBillType.get('billType'));
       await AsyncStorage.setItem(
         STORAGE.BILL_TYPE,
-        JSON.stringify(listBillType),
+        JSON.stringify(listBillType.get('billType')),
       );
+
+      await this.grantNotificationPermission();
 
       this.props.navigation.navigate('RootStack');
     } catch (error) {
@@ -59,7 +60,18 @@ class AppLoading extends Component {
 
   logInAnonymous = async () => {
     const credential = await firebase.auth().signInAnonymouslyAndRetrieveData();
+    console.log('logIn ->', credential);
     return credential.user ? credential.user.uid || null : null;
+  };
+
+  grantNotificationPermission = async () => {
+    const enabled = await firebase.messaging().hasPermission();
+    if (enabled) {
+      await firebase.messaging().requestPermission();
+      // user has permissions
+    } else {
+      // user doesn't have permission
+    }
   };
 
   // Render any loading content that you like here

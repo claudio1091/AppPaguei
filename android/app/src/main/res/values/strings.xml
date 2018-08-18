@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">PagueiApp</string>
+    <string name="app_name">Paguei?</string>
+    <string name="default_notification_channel_id">paguei-app</string>
 </resources>
