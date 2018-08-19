@@ -66,11 +66,13 @@ class AppLoading extends Component {
 
   grantNotificationPermission = async () => {
     const enabled = await firebase.messaging().hasPermission();
+    console.log('messaging permission ->', enabled);
     if (enabled) {
-      await firebase.messaging().requestPermission();
       // user has permissions
+      await firebase.messaging().requestPermission();
     } else {
       // user doesn't have permission
+      await firebase.messaging().requestPermission();
     }
   };
 

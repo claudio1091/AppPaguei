@@ -7,6 +7,7 @@ import moment from 'moment';
 import { TextInputMask } from 'react-native-masked-text';
 
 import firebase from 'react-native-firebase';
+import moment from 'moment';
 
 import Button from '../components/Button';
 import Container from '../components/Container';
@@ -69,58 +70,60 @@ export default class BillDetail extends Component {
 
   persistBill = async () => {
     try {
-      await AsyncStorage.getItem(STORAGE.BILLS, (err, result) => {
-        const {
-          id, dueDate, billType, description, value,
-        } = this.state;
-        const newBill = {
-          id,
-          dueDate,
-          billType,
-          description,
-          value,
-        };
-        let storagedValue = [];
+      const billToSave = {
+        id: this.state.id,
+        dueDate: this.state.dueDate,
+        billType: this.state.billType,
+        description: this.state.description,
+        value: this.state.value,
+      };
 
-        if (result) {
-          storagedValue = JSON.parse(result);
-        }
+      let storagedBills = await AsyncStorage.getItem(STORAGE.BILLS);
 
-        if (!newBill.id || newBill.id === '') {
-          newBill.id = Date.now().toString();
-        } else {
-          storagedValue = storagedValue.filter(bill => bill.id !== newBill.id);
-        }
+      if (storagedBills && storagedBills.length > 0) storagedBills = JSON.parse(storagedBills);
+      else storagedBills = [];
 
-        storagedValue.push(newBill);
+      if (!billToSave.id || billToSave.id === '') {
+        billToSave.id = moment()
+          .valueOf()
+          .toString();
+      } else {
+        // remove exists bill from storaged bills
+        storagedBills = storagedBills.filter(bill => bill.id !== billToSave.id);
+      }
 
-        console.log(storagedValue);
-
-        AsyncStorage.getItem('USER_UID', (err, result) => {
-          const userUid = JSON.parse(result);
-          const billId = newBill.id;
-
-          firebase
-            .firestore()
-            .collection('users')
-            .doc(userUid.databaseId)
-            .update({ billId: newBill });
-        });
-
-        AsyncStorage.setItem(
-          STORAGE.BILLS,
-          JSON.stringify(storagedValue),
-          (setErr, setResult) => {
-            console.log(setResult);
-            if (!setErr) {
-              this.props.navigation.goBack();
-            }
-          },
-        );
-      });
+      storagedBills.push(billToSave);
+      await AsyncStorage.setItem(STORAGE.BILLS, JSON.stringify(storagedBills));
+      await this.createScheduleNotification(billToSave);
+      this.props.navigation.goBack();
     } catch (error) {
       console.log(error);
     }
+  };
+
+  /**
+   * Set notification to 1 day before dueDate of bill.
+   * Notifications always show on 9:00AM
+   *
+   * @memberof BillDetail
+   */
+  createScheduleNotification = async (bill) => {
+    const notificationObj = new firebase.notifications.Notification()
+      .setTitle('Conta perto do vencimento')
+      .setBody(
+        `Sua conta de ${bill.billType.name} ira vencer dia ${bill.dueDate}`,
+      )
+      .android.setChannelId('paguei-app')
+      .android.setSmallIcon('ic_launcher');
+
+    const fireDate = moment(bill.dueDate)
+      .subtract(1, 'days')
+      .hour(9)
+      .minute(0);
+
+    firebase.notifications().scheduleNotification(notificationObj, {
+      fireDate,
+    });
   };
 
   removeBill = async () => {

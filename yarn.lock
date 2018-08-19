@@ -4943,6 +4943,13 @@ react-native-masked-text@^1.7.2:
     moment "2.19.3"
     tinymask "^1.0.2"
 
+react-native-notifications@^1.1.20:
+  version "1.1.20"
+  resolved "https://registry.yarnpkg.com/react-native-notifications/-/react-native-notifications-1.1.20.tgz#d0e7ba2c9c53d807f70e3e196dea120692b465a2"
+  dependencies:
+    core-js "^1.0.0"
+    uuid "^2.0.3"
+
 react-native-safe-area-view@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/react-native-safe-area-view/-/react-native-safe-area-view-0.7.0.tgz#38f5ab9368d6ef9e5d18ab64212938af3ec39421"
@@ -6046,6 +6053,10 @@ utils-merge@1.0.1:
 uuid@3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.0.1.tgz#6544bba2dfda8c1cf17e629a3a305e2bb1fee6c1"
+
+uuid@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-2.0.3.tgz#67e2e863797215530dff318e5bf9dcebfd47b21a"
 
 uuid@^3.3.2:
   version "3.3.2"

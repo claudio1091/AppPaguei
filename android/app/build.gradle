@@ -99,7 +99,7 @@ android {
 
     defaultConfig {
         applicationId "com.pagueiapp"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 22
         multiDexEnabled true
         versionCode 1
@@ -153,6 +153,7 @@ dependencies {
     implementation "com.google.firebase:firebase-ads:15.0.1"
     implementation "com.google.firebase:firebase-auth:16.0.2"
     implementation "com.google.firebase:firebase-messaging:17.1.0"
+    implementation 'me.leolin:ShortcutBadger:1.1.21@aar' // <-- Add this line if you wish to use badge on Android
     implementation "com.google.firebase:firebase-firestore:17.0.2"
 }
 
