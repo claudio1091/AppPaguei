@@ -7,7 +7,6 @@ import moment from 'moment';
 import { TextInputMask } from 'react-native-masked-text';
 
 import firebase from 'react-native-firebase';
-import moment from 'moment';
 
 import Button from '../components/Button';
 import Container from '../components/Container';
@@ -25,7 +24,6 @@ export default class BillDetail extends Component {
 
     const { navigation } = this.props;
     const billParam = navigation.getParam('bill', {});
-    console.log(billParam);
 
     this.state = {
       id: billParam.id || '',
@@ -36,7 +34,7 @@ export default class BillDetail extends Component {
       value: billParam.value || 0,
       modalVisible: false,
     };
-    console.log(this.state);
+
     this.setDate = this.setDate.bind(this);
   }
 
@@ -75,7 +73,7 @@ export default class BillDetail extends Component {
         dueDate: this.state.dueDate,
         billType: this.state.billType,
         description: this.state.description,
-        value: this.state.value,
+        value: this.state.value.toString().replace('R$ ', ''),
       };
 
       let storagedBills = await AsyncStorage.getItem(STORAGE.BILLS);
@@ -90,11 +88,12 @@ export default class BillDetail extends Component {
       } else {
         // remove exists bill from storaged bills
         storagedBills = storagedBills.filter(bill => bill.id !== billToSave.id);
+        await this.cancelScheduleNotification(billToSave.id);
       }
-
       storagedBills.push(billToSave);
       await AsyncStorage.setItem(STORAGE.BILLS, JSON.stringify(storagedBills));
       await this.createScheduleNotification(billToSave);
+
       this.props.navigation.goBack();
     } catch (error) {
       console.log(error);
@@ -108,58 +107,44 @@ export default class BillDetail extends Component {
    * @memberof BillDetail
    */
   createScheduleNotification = async (bill) => {
+    const dueDateFormated = moment(bill.dueDate).format('DD/MM/YYYY');
     const notificationObj = new firebase.notifications.Notification()
       .setTitle('Conta perto do vencimento')
       .setBody(
-        `Sua conta de ${bill.billType.name} ira vencer dia ${bill.dueDate}`,
+        `Sua conta de ${bill.billType.name} ira vencer dia ${dueDateFormated}`,
       )
+      .setNotificationId(bill.id)
       .android.setChannelId('paguei-app')
       .android.setSmallIcon('ic_launcher');
 
     const fireDate = moment(bill.dueDate)
       .subtract(1, 'days')
       .hour(9)
-      .minute(0);
+      .minute(0)
+      .valueOf();
 
     firebase.notifications().scheduleNotification(notificationObj, {
       fireDate,
     });
   };
 
+  cancelScheduleNotification = async (notificationId) => {
+    firebase.notifications().cancelNotification(notificationId);
+  };
+
   removeBill = async () => {
     try {
-      await AsyncStorage.getItem(STORAGE.BILLS, (err, result) => {
-        const {
-          id, dueDate, billType, description, value,
-        } = this.state;
+      const removeBillId = this.state.id;
+      let storagedBills = await AsyncStorage.getItem(STORAGE.BILLS);
 
-        const newBill = {
-          id,
-          dueDate,
-          billType,
-          description,
-          value,
-        };
-        let storagedValue = [];
+      if (storagedBills && storagedBills.length > 0) storagedBills = JSON.parse(storagedBills);
+      else return;
 
-        if (result) {
-          storagedValue = JSON.parse(result);
-        }
-        storagedValue = storagedValue.filter(bill => bill.id !== newBill.id);
+      storagedBills = storagedBills.filter(bill => bill.id !== removeBillId);
+      await this.cancelScheduleNotification(removeBillId);
+      await AsyncStorage.setItem(STORAGE.BILLS, JSON.stringify(storagedBills));
 
-        console.log(storagedValue);
-
-        AsyncStorage.setItem(
-          STORAGE.BILLS,
-          JSON.stringify(storagedValue),
-          (setErr, setResult) => {
-            console.log(setResult);
-            if (!setErr) {
-              this.props.navigation.goBack();
-            }
-          },
-        );
-      });
+      this.props.navigation.goBack();
     } catch (error) {
       console.log(error);
     }

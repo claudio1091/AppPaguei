@@ -3,6 +3,7 @@ import { View, Text, AsyncStorage } from 'react-native';
 import { Content, List } from 'native-base';
 import Icon from 'react-native-vector-icons/Ionicons';
 
+import moment from 'moment';
 import firebase from 'react-native-firebase';
 
 import { STORAGE } from '../constants';
@@ -10,7 +11,7 @@ import Container from '../components/Container';
 import FabButton from '../components/FabButton';
 import BillItemList from '../components/BillItemList';
 
-let didBlurSubscription;
+let willFocusSubscription;
 
 export default class BillList extends Component {
   static navigationOptions = ({ navigation }) => ({
@@ -31,20 +32,68 @@ export default class BillList extends Component {
     this.state = { bills: [], notification: {} };
     const _this = this;
 
-    didBlurSubscription = this.props.navigation.addListener('willFocus', () => _this.getFromStorage());
+    willFocusSubscription = this.props.navigation.addListener('willFocus', () => _this.getFromStorage());
+  }
+
+  componentDidMount() {
+    /*
+    // Build a channel
+    const channel = new firebase.notifications.Android.Channel(
+      'paguei-app',
+      'Test Channel',
+      firebase.notifications.Android.Importance.Default,
+    ).setDescription('My apps test channel');
+
+    // Create the channel
+    firebase.notifications().android.createChannel(channel);
+    */
+
+    this.notificationDisplayedListener = firebase
+      .notifications()
+      .onNotificationDisplayed((notification) => {
+        // Process your notification as required
+        // ANDROID: Remote notifications do not contain the channel ID. You will have to specify this manually if you'd like to re-display the notification.
+        console.log('notification ->', notification);
+      });
+    this.notificationListener = firebase
+      .notifications()
+      .onNotification((notification) => {
+        // Process your notification as required
+        console.log('notification ->', notification);
+        firebase.notifications().displayNotification(notification);
+      });
   }
 
   componentWillUnmount() {
-    if (didBlurSubscription) {
-      didBlurSubscription.remove();
+    if (willFocusSubscription) {
+      willFocusSubscription.remove();
     }
+
+    this.notificationDisplayedListener();
+    this.notificationListener();
   }
 
   getFromStorage = async () => {
     try {
-      const billsStoraged = await AsyncStorage.getItem(STORAGE.BILLS);
+      let billsStoraged = await AsyncStorage.getItem(STORAGE.BILLS);
 
-      this.setState({ bills: JSON.parse(billsStoraged) });
+      console.log('billsStoraged ->', billsStoraged);
+      if (billsStoraged) {
+        billsStoraged = JSON.parse(billsStoraged);
+
+        console.log('billsStoraged parsed ->', billsStoraged);
+        billsStoraged.sort((bill1, bill2) => {
+          const momentA = moment(bill1.dueDate);
+          const momentB = moment(bill2.dueDate);
+          if (momentA > momentB) return 1;
+          if (momentA < momentB) return -1;
+          return 0;
+        });
+      }
+
+      console.log('bills storage ->', billsStoraged);
+
+      this.setState({ bills: billsStoraged });
       return billsStoraged;
     } catch (error) {
       console.log('error storage');
