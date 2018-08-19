@@ -13,13 +13,20 @@ import { THEME } from '../../constants';
 
 const styles = StyleSheet.create({
   itemContainer: {
-    height: Dimensions.get('window').height / 8,
-    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height / 10,
+    width: Dimensions.get('window').width - 20,
     flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     flex: 1,
     padding: 20,
     paddingVertical: 10,
     backgroundColor: THEME.FONT_COLOR,
+    marginVertical: 5,
+    marginHorizontal: 10,
+    borderRadius: 8,
+    borderColor: THEME.PRIMARY,
+    borderWidth: 1,
   },
   iconContainer: {
     flex: 1,

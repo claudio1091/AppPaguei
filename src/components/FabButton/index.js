@@ -8,15 +8,17 @@ import {
 import PropTypes from 'prop-types';
 import Icon from 'react-native-vector-icons/Ionicons';
 
+import { THEME } from '../../constants';
+
 const styles = StyleSheet.create({
   fabIcon: {
     position: 'absolute',
-    right: 30,
-    bottom: 30,
+    right: 15,
+    bottom: 15,
     height: Dimensions.get('window').width / 6,
     width: Dimensions.get('window').width / 6,
     borderRadius: Dimensions.get('window').width / 6,
-    backgroundColor: '#0076DD',
+    backgroundColor: THEME.PRIMARY,
     padding: 8,
     justifyContent: 'center',
     alignItems: 'center',

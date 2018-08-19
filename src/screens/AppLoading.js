@@ -2,13 +2,15 @@ import React, { Component } from 'react';
 import {
   ActivityIndicator,
   AsyncStorage,
+  Dimensions,
+  Image,
   StyleSheet,
   View,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import firebase from 'react-native-firebase';
 
-import { STORAGE } from '../constants';
+import { THEME, STORAGE } from '../constants';
 
 class AppLoading extends Component {
   constructor(props) {
@@ -75,7 +77,14 @@ class AppLoading extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <ActivityIndicator />
+        <Image
+          source={require('../../assets/web_hi_res_512.png')}
+          style={{
+            width: Dimensions.get('window').width / 2,
+            height: Dimensions.get('window').width / 2,
+          }}
+        />
+        <ActivityIndicator size="large" />
       </View>
     );
   }
@@ -83,11 +92,11 @@ class AppLoading extends Component {
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: 'center',
+    backgroundColor: THEME.FONT_COLOR,
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFF',
   },
 });
 

@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
     backgroundColor: 'transparent',
-    borderRadius: 8,
+    borderRadius: 5,
     flexDirection: 'row',
     justifyContent: 'center',
     padding: 2,
@@ -21,16 +21,16 @@ const styles = StyleSheet.create({
   },
   buttonPrimary: {
     backgroundColor: THEME.PRIMARY,
-    elevation: 3,
+    elevation: 1,
   },
   buttonCancel: {
     backgroundColor: THEME.CANCEL,
-    elevation: 3,
+    elevation: 1,
   },
   textStyle: {
     color: THEME.FONT,
     fontFamily: 'Roboto',
-    fontSize: 20,
+    fontSize: 16,
     includeFontPadding: false,
     lineHeight: 20,
   },

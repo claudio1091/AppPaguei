@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
 import { AsyncStorage, View, Text } from 'react-native';
 import {
-  Form, Item, Label, Input, DatePicker,
+  Container,
+  Content,
+  Form,
+  Item,
+  Label,
+  Input,
+  DatePicker,
 } from 'native-base';
 import moment from 'moment';
 import { TextInputMask } from 'react-native-masked-text';
@@ -9,7 +15,7 @@ import { TextInputMask } from 'react-native-masked-text';
 import firebase from 'react-native-firebase';
 
 import Button from '../components/Button';
-import Container from '../components/Container';
+// import Container from '../components/Container';
 import BillTypeButton from '../components/BillTypeButton';
 
 import { STORAGE, THEME } from '../constants';
@@ -162,87 +168,90 @@ export default class BillDetail extends Component {
     } = this.state;
 
     return (
-      <Container padding>
-        <Form>
-          <BillTypeButton
-            billType={billType}
-            onSelectBillType={this.selectBillType.bind(this)}
+      <Container>
+        <Content padder>
+          <Form>
+            <BillTypeButton
+              billType={billType}
+              onSelectBillType={this.selectBillType.bind(this)}
+            />
+
+            <Item stackedLabel>
+              <Label>Descrição</Label>
+              <Input
+                value={description}
+                placeholder="Insira uma descrição para a conta"
+                onChangeText={value => this.setState({ description: value })}
+              />
+            </Item>
+
+            <Item stackedLabel>
+              <Label>Valor</Label>
+              <TextInputMask
+                value={value}
+                type="money"
+                customTextInput={Input}
+                onChangeText={value => this.setState({ value })}
+                options={{
+                  unit: 'R$ ',
+                }}
+              />
+            </Item>
+
+            <View
+              style={{
+                backgroundColor: 'transparent',
+                flexDirection: 'column',
+                borderBottomColor: '#DDDDDD',
+                borderBottomWidth: 1,
+                paddingBottom: 3,
+                paddingTop: 15,
+                marginLeft: 5,
+                marginBottom: 20,
+              }}
+            >
+              <Text style={{ color: '#606060', fontSize: 15, marginLeft: 10 }}>
+                Data de Vencimento
+              </Text>
+              <DatePicker
+                defaultDate={new Date(dueDate) || new Date()}
+                minimumDate={new Date(2018, 1, 1)}
+                maximumDate={new Date(2060, 12, 31)}
+                formatChosenDate={this.formatBillDate}
+                timeZoneOffsetInMinutes={undefined}
+                modalTransparent={false}
+                animationType="fade"
+                androidMode="calendar"
+                textStyle={{
+                  color: THEME.FONT,
+                  fontFamily: 'Roboto',
+                  fontSize: 18,
+                  includeFontPadding: false,
+                  lineHeight: 18,
+                }}
+                onDateChange={this.setDate}
+              />
+            </View>
+          </Form>
+
+          <Button
+            primary
+            padding
+            text="Salvar Conta"
+            onPress={this.persistBill.bind(this)}
           />
 
-          <Item stackedLabel>
-            <Label>Descrição</Label>
-            <Input
-              value={description}
-              onChangeText={value => this.setState({ description: value })}
-            />
-          </Item>
-
-          <Item stackedLabel>
-            <Label>Valor</Label>
-            <TextInputMask
-              value={value}
-              type="money"
-              customTextInput={Input}
-              onChangeText={value => this.setState({ value })}
-              options={{
-                unit: 'R$ ',
-              }}
-            />
-          </Item>
-
-          <View
-            style={{
-              backgroundColor: 'transparent',
-              flexDirection: 'column',
-              borderBottomColor: '#DDDDDD',
-              borderBottomWidth: 1,
-              paddingBottom: 3,
-              paddingTop: 15,
-              marginLeft: 5,
-              marginBottom: 20,
-            }}
-          >
-            <Text style={{ color: '#606060', fontSize: 15, marginLeft: 10 }}>
-              Data de Vencimento
-            </Text>
-            <DatePicker
-              defaultDate={new Date(dueDate) || new Date()}
-              minimumDate={new Date(2018, 1, 1)}
-              maximumDate={new Date(2060, 12, 31)}
-              formatChosenDate={this.formatBillDate}
-              timeZoneOffsetInMinutes={undefined}
-              modalTransparent={false}
-              animationType="fade"
-              androidMode="calendar"
-              textStyle={{
-                color: THEME.FONT,
-                fontFamily: 'Roboto',
-                fontSize: 18,
-                includeFontPadding: false,
-                lineHeight: 18,
-              }}
-              onDateChange={this.setDate}
-            />
-          </View>
-        </Form>
-
-        <Button
-          primary
-          padding
-          text="Salvar Conta"
-          onPress={this.persistBill.bind(this)}
-        />
-
-        {id !== '' && (
-          <View style={{ flex: 1 }}>
-            <Button
-              cancel
-              padding
-              text="Excluir Conta"
-              onPress={this.removeBill.bind(this)}
-            />
-          </View>
-        )}
+          {id !== '' && (
+            <View style={{ flex: 1 }}>
+              <Button
+                cancel
+                padding
+                text="Excluir Conta"
+                onPress={this.removeBill.bind(this)}
+              />
+            </View>
+          )}
+        </Content>
       </Container>
     );
   }

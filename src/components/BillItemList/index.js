@@ -17,9 +17,10 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width,
     flexDirection: 'row',
     flex: 1,
-    padding: 20,
-    paddingVertical: 10,
+    padding: 10,
     backgroundColor: THEME.FONT_COLOR,
+    borderBottomColor: THEME.BACKGROUND,
+    borderBottomWidth: 2,
   },
   dateContainer: {
     flex: 1,
@@ -38,8 +39,8 @@ const styles = StyleSheet.create({
   },
   selectedMonth: {
     color: THEME.FONT_COLOR,
-    fontSize: 18,
-    lineHeight: 18,
+    fontSize: 14,
+    lineHeight: 14,
     includeFontPadding: false,
   },
   infoContainer: {
@@ -51,7 +52,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   billDescription: {
-    fontSize: 10,
+    fontSize: 14,
   },
   valueContainer: {
     flex: 1,

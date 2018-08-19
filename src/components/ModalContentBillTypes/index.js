@@ -1,22 +1,23 @@
 import React from 'react';
 import {
-  Header, Title, Body, Content, List,
+  Container, Header, Title, Body, Content, List,
 } from 'native-base';
 import PropTypes from 'prop-types';
 
 import BillTypeItemList from '../BillTypeItemList';
 import Button from '../Button';
-import Container from '../Container';
+// import Container from '../Container';
+import { THEME } from '../../constants';
 
 function ModalContentBillTypes(props) {
   return (
-    <Container>
-      <Header>
+    <Container style={{ backgroundColor: THEME.BACKGROUND }}>
+      <Header style={{ backgroundColor: THEME.PRIMARY }}>
         <Body>
-          <Title>Selecione um tipo de conta:</Title>
+          <Title style={{ marginLeft: 10 }}>Selecione um tipo de conta:</Title>
         </Body>
       </Header>
-      <Content padder>
+      <Content>
         <List>
           {props.billTypes.map((billType, i) => (
             <BillTypeItemList
@@ -27,7 +28,9 @@ function ModalContentBillTypes(props) {
           ))}
         </List>
 
-        <Button padding cancel text="Fechar" onPress={props.hideModal} />
+        <Content padder>
+          <Button padding cancel text="Fechar" onPress={props.hideModal} />
+        </Content>
       </Content>
     </Container>
   );

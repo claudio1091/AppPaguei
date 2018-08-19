@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { View, Text, AsyncStorage } from 'react-native';
+import {
+  AsyncStorage, Image, View, Text,
+} from 'react-native';
 import { Content, List } from 'native-base';
-import Icon from 'react-native-vector-icons/Ionicons';
 
 import moment from 'moment';
 import firebase from 'react-native-firebase';
@@ -14,18 +15,20 @@ import BillItemList from '../components/BillItemList';
 let willFocusSubscription;
 
 export default class BillList extends Component {
-  static navigationOptions = ({ navigation }) => ({
-    title: 'PAGUEI?',
-    headerRight: (
-      <Icon
-        name="md-more"
-        style={{ padding: 10 }}
-        size={30}
-        color="white"
-        onPress={() => navigation.navigate('BillTypeListScrn')}
-      />
+  static navigationOptions = {
+    // headerTitle instead of title
+    headerTitle: (
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <Image
+          source={require('../../assets/web_hi_res_512.png')}
+          style={{ width: 35, height: 35 }}
+        />
+        <Text style={{ color: 'white', fontSize: 25, marginLeft: 10 }}>
+          Paguei?
+        </Text>
+      </View>
     ),
-  });
+  };
 
   constructor(props) {
     super(props);
@@ -135,7 +138,7 @@ export default class BillList extends Component {
         <FabButton navigation={this.props.navigation} />
 
         <Banner
-          unitId="ca-app-pub-3940256099942544/6300978111"
+          unitId="ca-app-pub-5398707650805959/4320963510"
           size="FULL_BANNER"
           request={request.build()}
           onAdLoaded={() => {
@@ -146,12 +149,3 @@ export default class BillList extends Component {
     );
   }
 }
-
-/**
- * <AdMobBanner
-          bannerSize="fullBanner"
-          adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
-          testDeviceID="EMULATOR"
-          onDidFailToReceiveAdWithError={this.bannerError}
-        />
- */
