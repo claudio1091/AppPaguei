@@ -1,35 +1,38 @@
 import { StyleSheet, Dimensions } from 'react-native';
-import { THEME } from '../../constants';
+import { ACCENT, BACKGROUND, FONT_ACCENT } from '../../config/theme';
 
 export default StyleSheet.create({
   itemContainer: {
-    height: Dimensions.get('window').height / 8,
-    width: Dimensions.get('window').width,
-    flexDirection: 'row',
+    backgroundColor: 'white',
+    borderBottomColor: BACKGROUND,
+    borderBottomWidth: 1,
+    elevation: 2,
     flex: 1,
-    padding: 10,
-    backgroundColor: THEME.FONT_COLOR,
-    borderBottomColor: THEME.BACKGROUND,
-    borderBottomWidth: 2,
+    flexDirection: 'row',
+    height: Dimensions.get('window').height / 8,
+    padding: 8,
+    width: Dimensions.get('window').width,
   },
   dateContainer: {
+    alignItems: 'center',
+    backgroundColor: ACCENT,
+    borderRadius: 8,
+    elevation: 2,
     flex: 1,
-    backgroundColor: THEME.PRIMARY,
-    borderRadius: 15,
     flexDirection: 'column',
     justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 3,
   },
   selectedDay: {
-    color: THEME.FONT_COLOR,
+    color: FONT_ACCENT,
     fontSize: 30,
+    fontWeight: 'bold',
     lineHeight: 30,
     includeFontPadding: false,
   },
   selectedMonth: {
-    color: THEME.FONT_COLOR,
+    color: FONT_ACCENT,
     fontSize: 14,
+    fontWeight: '300',
     lineHeight: 14,
     includeFontPadding: false,
   },
@@ -45,9 +48,8 @@ export default StyleSheet.create({
     fontSize: 14,
   },
   valueContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
+    width: 90,
+    flexDirection: 'row',
     alignItems: 'center',
   },
 });

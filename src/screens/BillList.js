@@ -138,7 +138,7 @@ export default class BillList extends Component {
         <FabButton navigation={this.props.navigation} />
 
         <Banner
-          unitId="ca-app-pub-5398707650805959/4320963510"
+          unitId="ca-app-pub-3940256099942544/6300978111"
           size="FULL_BANNER"
           request={request.build()}
           onAdLoaded={() => {

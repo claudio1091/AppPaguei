@@ -55,6 +55,7 @@ class BillTypeButton extends Component {
 
   render() {
     const { billType, billTypesList, modalVisible } = this.state;
+    const { error } = this.props;
 
     return (
       <View>
@@ -77,7 +78,12 @@ class BillTypeButton extends Component {
           background={TouchableNativeFeedback.SelectableBackground()}
           onPress={() => this.setModalVisible()}
         >
-          <View style={styles.billTypeButton}>
+          <View
+            style={[
+              styles.billTypeButton,
+              error ? { borderBottomColor: 'red' } : {},
+            ]}
+          >
             <View style={styles.containerTextDefault}>
               {billType.icon && (
                 <Icon name={billType.icon} size={25} color={THEME.FONT} />
@@ -86,6 +92,7 @@ class BillTypeButton extends Component {
                 style={[
                   styles.billTypeButtonText,
                   billType.name ? { marginLeft: 15, color: THEME.FONT } : {},
+                  error ? { color: 'red' } : {},
                 ]}
               >
                 {billType.name ? billType.name : 'Selecione o Tipo de Conta'}
@@ -104,11 +111,13 @@ class BillTypeButton extends Component {
 BillTypeButton.propTypes = {
   onSelectBillType: PropTypes.func,
   billType: PropTypes.object,
+  error: PropTypes.bool,
 };
 
 BillTypeButton.defaultProps = {
   onSelectBillType: () => {},
   billType: {},
+  error: false,
 };
 
 export default BillTypeButton;
