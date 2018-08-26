@@ -4,7 +4,7 @@ import { ACCENT, BACKGROUND, FONT_ACCENT } from '../../config/theme';
 export default StyleSheet.create({
   itemContainer: {
     backgroundColor: 'white',
-    borderBottomColor: BACKGROUND,
+    borderBottomColor: '#DDDDDD',
     borderBottomWidth: 1,
     elevation: 2,
     flex: 1,

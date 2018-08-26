@@ -13,15 +13,14 @@ import firebase from 'react-native-firebase';
 import { THEME, STORAGE } from '../constants';
 
 class AppLoading extends Component {
-  constructor(props) {
-    super(props);
-    this.bootstrapAsync();
+  async componentDidMount() {
+    await this.bootstrapAsync();
   }
 
   // Fetch the token from storage then navigate to our appropriate place
   bootstrapAsync = async () => {
     try {
-      const userToken = await AsyncStorage.getItem('USER_TOKEN');
+      /* const userToken = await AsyncStorage.getItem('USER_TOKEN');
 
       if (!userToken) {
         const FCM = firebase.messaging();
@@ -33,18 +32,34 @@ class AppLoading extends Component {
           'USER_TOKEN',
           JSON.stringify({ token: FcmToken, createAt: new Date(), uid }),
         );
-      }
+      } */
 
-      const listBillType = await firebase
+      // Build a channel
+      const channel = new firebase.notifications.Android.Channel(
+        'paguei-channel',
+        'Paguei Channel',
+        firebase.notifications.Android.Importance.Max,
+      ).setDescription('Paguei App channel');
+
+      // Create the channel
+      firebase.notifications().android.createChannel(channel);
+
+      /* firebase
         .firestore()
         .collection('config')
         .doc('default')
-        .get();
+        .get()
+        .then((defaultBillType) => {
+          AsyncStorage.setItem(
+            STORAGE.BILL_TYPE,
+            JSON.stringify(defaultBillType.get('billType')),
+          );
+        }); */
 
-      await AsyncStorage.setItem(
+      /* await AsyncStorage.setItem(
         STORAGE.BILL_TYPE,
         JSON.stringify(listBillType.get('billType')),
-      );
+      ); */
 
       await this.grantNotificationPermission();
 
@@ -57,13 +72,11 @@ class AppLoading extends Component {
 
   logInAnonymous = async () => {
     const credential = await firebase.auth().signInAnonymouslyAndRetrieveData();
-    console.log('logIn ->', credential);
     return credential.user ? credential.user.uid || null : null;
   };
 
   grantNotificationPermission = async () => {
     const enabled = await firebase.messaging().hasPermission();
-    console.log('messaging permission ->', enabled);
     if (enabled) {
       // user has permissions
       await firebase.messaging().requestPermission();

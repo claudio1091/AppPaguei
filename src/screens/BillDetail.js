@@ -115,7 +115,10 @@ export default class BillDetail extends Component {
       }
       storagedBills.push(billToSave);
       await AsyncStorage.setItem(STORAGE.BILLS, JSON.stringify(storagedBills));
-      await this.createScheduleNotification(billToSave);
+
+      if (this.state.notify) {
+        await this.createScheduleNotification(billToSave);
+      }
 
       this.props.navigation.goBack();
     } catch (error) {
@@ -146,7 +149,7 @@ export default class BillDetail extends Component {
       .minute(0)
       .valueOf();
 
-    firebase.notifications().scheduleNotification(notificationObj, {
+    await firebase.notifications().scheduleNotification(notificationObj, {
       fireDate,
     });
   };

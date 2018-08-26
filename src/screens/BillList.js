@@ -39,18 +39,6 @@ export default class BillList extends Component {
   }
 
   componentDidMount() {
-    /*
-    // Build a channel
-    const channel = new firebase.notifications.Android.Channel(
-      'paguei-app',
-      'Test Channel',
-      firebase.notifications.Android.Importance.Default,
-    ).setDescription('My apps test channel');
-
-    // Create the channel
-    firebase.notifications().android.createChannel(channel);
-    */
-
     this.notificationDisplayedListener = firebase
       .notifications()
       .onNotificationDisplayed((notification) => {
@@ -110,10 +98,8 @@ export default class BillList extends Component {
   };
 
   render() {
-    let { bills } = this.state;
-
-    if (!bills) {
-      bills = [];
+    if (!this.state.bills) {
+      this.state.bills = [];
     }
 
     const Banner = firebase.admob.Banner;
@@ -125,7 +111,7 @@ export default class BillList extends Component {
       <Container>
         <Content>
           <List>
-            {bills.map(billObj => (
+            {this.state.bills.map(billObj => (
               <BillItemList
                 key={billObj.id}
                 navigation={this.props.navigation}
@@ -141,9 +127,6 @@ export default class BillList extends Component {
           unitId="ca-app-pub-3940256099942544/6300978111"
           size="FULL_BANNER"
           request={request.build()}
-          onAdLoaded={() => {
-            console.log('Advert loaded');
-          }}
         />
       </Container>
     );
