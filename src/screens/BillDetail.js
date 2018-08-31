@@ -97,7 +97,6 @@ export default class BillDetail extends Component {
     };
 
     const billSaved = await PersistBill(billToSave);
-    console.log('billSaved ->', billSaved);
 
     if (billSaved instanceof Object && billSaved.error) {
       this.setState({ formValidate: billSaved.error });
