@@ -1,21 +1,16 @@
 import React, { Component } from 'react';
-import { AsyncStorage, View, Text } from 'react-native';
+import { AsyncStorage, View } from 'react-native';
+import { Content, Form, DatePicker } from 'native-base';
 import {
-  Container,
-  Content,
-  Form,
-  Item,
-  Label,
-  Input,
-  DatePicker,
-} from 'native-base';
+  TextInput, Checkbox, TouchableRipple, Text,
+} from 'react-native-paper';
 import moment from 'moment';
-import { TextInputMask } from 'react-native-masked-text';
+import { MaskService } from 'react-native-masked-text';
 
 import firebase from 'react-native-firebase';
 
 import Button from '../components/Button';
-// import Container from '../components/Container';
+import Container from '../components/Container';
 import BillTypeButton from '../components/BillTypeButton';
 
 import { STORAGE, THEME } from '../constants';
@@ -34,46 +29,64 @@ export default class BillDetail extends Component {
     this.state = {
       id: billParam.id || '',
       dueDate: billParam.dueDate || new Date(),
-      billTypesList: [],
       billType: billParam.billType || {},
       description: billParam.description || '',
       value: billParam.value || 0,
-      modalVisible: false,
+      notify: false,
+      repeat: false,
+      maskedValue: '',
+      formValidate: {
+        billType: false,
+        description: false,
+        value: false,
+      },
     };
 
     this.setDate = this.setDate.bind(this);
-  }
 
-  componentDidMount() {
-    this.getFromStorage();
-  }
+    if (billParam.value) {
+      const money = MaskService.toMask(
+        'money',
+        parseFloat(billParam.value).toFixed(2),
+        {
+          unit: 'R$ ',
+          separator: ',',
+          delimiter: '.',
+        },
+      );
 
-  getFromStorage = async () => {
-    try {
-      const billTypeStoraged = await AsyncStorage.getItem(STORAGE.BILL_TYPE);
-      this.setState({ billTypesList: JSON.parse(billTypeStoraged) });
-      return billTypeStoraged;
-    } catch (error) {
-      console.log('error storage');
-      console.log(error);
-      return [];
+      this.state.maskedValue = money;
     }
-  };
+  }
 
   setDate(newDate) {
     this.setState({ dueDate: newDate });
   }
 
-  setModalVisible() {
-    this.setState({ modalVisible: true });
-  }
+  validateForm = () => {
+    const inputError = {};
 
-  setModalInvisible() {
-    this.setState({ modalVisible: false });
-  }
+    if (!this.state.description || this.state.description.length === 0) {
+      inputError.description = true;
+    }
+    if (!this.state.value || this.state.value === 0) {
+      inputError.value = true;
+    }
+    if (!this.state.billType || Object.keys(this.state.billType).length === 0) {
+      inputError.billType = true;
+    }
+
+    if (Object.keys(inputError).length > 0) {
+      this.setState({ formValidate: inputError });
+      return false;
+    }
+
+    return true;
+  };
 
   persistBill = async () => {
     try {
+      const formValid = this.validateForm();
       const billToSave = {
         id: this.state.id,
         dueDate: this.state.dueDate,
@@ -81,6 +94,10 @@ export default class BillDetail extends Component {
         description: this.state.description,
         value: this.state.value.toString().replace('R$ ', ''),
       };
+
+      if (!formValid) {
+        return;
+      }
 
       let storagedBills = await AsyncStorage.getItem(STORAGE.BILLS);
 
@@ -98,7 +115,10 @@ export default class BillDetail extends Component {
       }
       storagedBills.push(billToSave);
       await AsyncStorage.setItem(STORAGE.BILLS, JSON.stringify(storagedBills));
-      await this.createScheduleNotification(billToSave);
+
+      if (this.state.notify) {
+        await this.createScheduleNotification(billToSave);
+      }
 
       this.props.navigation.goBack();
     } catch (error) {
@@ -129,7 +149,7 @@ export default class BillDetail extends Component {
       .minute(0)
       .valueOf();
 
-    firebase.notifications().scheduleNotification(notificationObj, {
+    await firebase.notifications().scheduleNotification(notificationObj, {
       fireDate,
     });
   };
@@ -158,45 +178,65 @@ export default class BillDetail extends Component {
 
   formatBillDate = date => moment(date).format('DD/MM/YYYY');
 
+  handleValueChange = (valueData) => {
+    const formValidate = this.state.formValidate;
+    formValidate.value = false;
+
+    const money = MaskService.toMask('money', valueData, {
+      unit: 'R$ ',
+      separator: ',',
+      delimiter: '.',
+    });
+
+    this.setState({
+      value: parseFloat(MaskService.toRawValue('money', money)).toFixed(2),
+      maskedValue: money,
+      formValidate,
+    });
+  };
+
   selectBillType(billType) {
-    this.setState({ billType });
+    const formValidate = this.state.formValidate;
+    formValidate.billType = false;
+    this.setState({ billType, formValidate });
   }
 
   render() {
     const {
-      id, billType, dueDate, description, value,
+      id,
+      dueDate,
+      billType,
+      description,
+      notify,
+      repeat,
+      maskedValue,
+      formValidate,
     } = this.state;
 
     return (
-      <Container>
-        <Content padder>
+      <Container padding>
+        <Content style={{ backgroundColor: 'white' }}>
           <Form>
             <BillTypeButton
               billType={billType}
+              error={formValidate.billType}
               onSelectBillType={this.selectBillType.bind(this)}
             />
 
-            <Item stackedLabel>
-              <Label>Descrição</Label>
-              <Input
-                value={description}
-                placeholder="Insira uma descrição para a conta"
-                onChangeText={value => this.setState({ description: value })}
-              />
-            </Item>
+            <TextInput
+              label="Descrição"
+              value={description}
+              onChangeText={data => this.setState({ description: data })}
+              error={formValidate.description}
+            />
 
-            <Item stackedLabel>
-              <Label>Valor</Label>
-              <TextInputMask
-                value={value}
-                type="money"
-                customTextInput={Input}
-                onChangeText={value => this.setState({ value })}
-                options={{
-                  unit: 'R$ ',
-                }}
-              />
-            </Item>
+            <TextInput
+              label="Valor"
+              value={maskedValue}
+              onChangeText={data => this.handleValueChange(data)}
+              keyboardType="numeric"
+              error={formValidate.value}
+            />
 
             <View
               style={{
@@ -204,13 +244,11 @@ export default class BillDetail extends Component {
                 flexDirection: 'column',
                 borderBottomColor: '#DDDDDD',
                 borderBottomWidth: 1,
-                paddingBottom: 3,
                 paddingTop: 15,
-                marginLeft: 5,
                 marginBottom: 20,
               }}
             >
-              <Text style={{ color: '#606060', fontSize: 15, marginLeft: 10 }}>
+              <Text style={{ color: '#606060', fontSize: 12 }}>
                 Data de Vencimento
               </Text>
               <DatePicker
@@ -232,6 +270,60 @@ export default class BillDetail extends Component {
                 onDateChange={this.setDate}
               />
             </View>
+
+            <TouchableRipple
+              onPress={() => this.setState({ repeat: !repeat })}
+              rippleColor="rgba(0, 0, 0, .32)"
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  height: 50,
+                }}
+              >
+                <Text
+                  style={{
+                    flex: 4,
+                    color: THEME.FONT,
+                    fontFamily: 'Roboto',
+                    fontSize: 15,
+                    includeFontPadding: false,
+                    lineHeight: 15,
+                  }}
+                >
+                  Repetir todo mês
+                </Text>
+                <Checkbox checked={repeat} style={{ flex: 1 }} />
+              </View>
+            </TouchableRipple>
+
+            <TouchableRipple
+              onPress={() => this.setState({ notify: !notify })}
+              rippleColor="rgba(0, 0, 0, .32)"
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  height: 50,
+                }}
+              >
+                <Text
+                  style={{
+                    flex: 4,
+                    color: THEME.FONT,
+                    fontFamily: 'Roboto',
+                    fontSize: 15,
+                    includeFontPadding: false,
+                    lineHeight: 15,
+                  }}
+                >
+                  Notificar próx. ao vencimento
+                </Text>
+                <Checkbox checked={notify} style={{ flex: 1 }} />
+              </View>
+            </TouchableRipple>
           </Form>
 
           <Button
