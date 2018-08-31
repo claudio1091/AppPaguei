@@ -103,17 +103,9 @@ android {
         targetSdkVersion 22
         multiDexEnabled true
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.1"
         ndk {
             abiFilters "armeabi-v7a", "x86"
-        }
-    }
-    splits {
-        abi {
-            reset()
-            enable enableSeparateBuildPerCPUArchitecture
-            universalApk false  // If true, also generate a universal APK
-            include "armeabi-v7a", "x86"
         }
     }
     signingConfigs {
@@ -129,6 +121,7 @@ android {
     buildTypes {
         release {
             minifyEnabled enableProguardInReleaseBuilds
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
