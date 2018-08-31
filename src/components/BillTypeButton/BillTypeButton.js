@@ -11,8 +11,9 @@ import PropTypes from 'prop-types';
 
 import styles from './style';
 import ModalContentBillTypes from '../ModalContentBillTypes';
+import { GetBillTypes } from '../../helper/billTypesHelper';
 
-import { STORAGE, THEME } from '../../constants';
+import { THEME } from '../../constants';
 
 class BillTypeButton extends Component {
   constructor(props) {
@@ -24,17 +25,10 @@ class BillTypeButton extends Component {
     };
   }
 
-  getFromStorage = async () => {
-    try {
-      const billTypeStoraged = await AsyncStorage.getItem(STORAGE.BILL_TYPE);
-      this.setState({ billTypesList: JSON.parse(billTypeStoraged) });
-      return billTypeStoraged;
-    } catch (error) {
-      console.log('error storage');
-      console.log(error);
-      return [];
-    }
-  };
+  async componentDidMount() {
+    const billTypes = await GetBillTypes();
+    this.setState({ billTypesList: billTypes });
+  }
 
   setBillType(billType) {
     this.props.onSelectBillType(billType);
@@ -42,10 +36,6 @@ class BillTypeButton extends Component {
   }
 
   setModalVisible = async () => {
-    if (this.state.billTypesList.length === 0) {
-      await this.getFromStorage();
-    }
-
     this.setState({ modalVisible: true });
   };
 
@@ -63,9 +53,7 @@ class BillTypeButton extends Component {
           animationType="slide"
           transparent={false}
           visible={modalVisible}
-          onRequestClose={() => {
-            alert('Modal has been closed.');
-          }}
+          onRequestClose={() => true}
         >
           <ModalContentBillTypes
             billTypes={billTypesList}
