@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { AsyncStorage, View } from 'react-native';
+import { View } from 'react-native';
 import { Content, Form, DatePicker } from 'native-base';
 import {
   TextInput, Checkbox, TouchableRipple, Text,
@@ -9,6 +9,7 @@ import { MaskService } from 'react-native-masked-text';
 
 import firebase from 'react-native-firebase';
 
+import { PersistBill, RemoveBill } from '../helper/billsHelper';
 import Button from '../components/Button';
 import Container from '../components/Container';
 import BillTypeButton from '../components/BillTypeButton';
@@ -85,94 +86,33 @@ export default class BillDetail extends Component {
   };
 
   persistBill = async () => {
-    try {
-      const formValid = this.validateForm();
-      const billToSave = {
-        id: this.state.id,
-        dueDate: this.state.dueDate,
-        billType: this.state.billType,
-        description: this.state.description,
-        value: this.state.value.toString().replace('R$ ', ''),
-      };
+    const billToSave = {
+      id: this.state.id,
+      dueDate: this.state.dueDate,
+      billType: this.state.billType,
+      description: this.state.description,
+      value: this.state.value.toString().replace('R$ ', ''),
+      notify: this.state.notify,
+      repeat: this.state.repeat,
+    };
 
-      if (!formValid) {
-        return;
-      }
+    const billSaved = await PersistBill(billToSave);
+    console.log('billSaved ->', billSaved);
 
-      let storagedBills = await AsyncStorage.getItem(STORAGE.BILLS);
-
-      if (storagedBills && storagedBills.length > 0) storagedBills = JSON.parse(storagedBills);
-      else storagedBills = [];
-
-      if (!billToSave.id || billToSave.id === '') {
-        billToSave.id = moment()
-          .valueOf()
-          .toString();
-      } else {
-        // remove exists bill from storaged bills
-        storagedBills = storagedBills.filter(bill => bill.id !== billToSave.id);
-        await this.cancelScheduleNotification(billToSave.id);
-      }
-      storagedBills.push(billToSave);
-      await AsyncStorage.setItem(STORAGE.BILLS, JSON.stringify(storagedBills));
-
-      if (this.state.notify) {
-        await this.createScheduleNotification(billToSave);
-      }
-
-      this.props.navigation.goBack();
-    } catch (error) {
-      console.log(error);
+    if (billSaved instanceof Object && billSaved.error) {
+      this.setState({ formValidate: billSaved.error });
+      return;
     }
-  };
 
-  /**
-   * Set notification to 1 day before dueDate of bill.
-   * Notifications always show on 9:00AM
-   *
-   * @memberof BillDetail
-   */
-  createScheduleNotification = async (bill) => {
-    const dueDateFormated = moment(bill.dueDate).format('DD/MM/YYYY');
-    const notificationObj = new firebase.notifications.Notification()
-      .setTitle('Conta perto do vencimento')
-      .setBody(
-        `Sua conta de ${bill.billType.name} ira vencer dia ${dueDateFormated}`,
-      )
-      .setNotificationId(bill.id)
-      .android.setChannelId('paguei-app')
-      .android.setSmallIcon('ic_launcher');
-
-    const fireDate = moment(bill.dueDate)
-      .subtract(1, 'days')
-      .hour(9)
-      .minute(0)
-      .valueOf();
-
-    await firebase.notifications().scheduleNotification(notificationObj, {
-      fireDate,
-    });
-  };
-
-  cancelScheduleNotification = async (notificationId) => {
-    firebase.notifications().cancelNotification(notificationId);
+    this.props.navigation.goBack();
   };
 
   removeBill = async () => {
-    try {
-      const removeBillId = this.state.id;
-      let storagedBills = await AsyncStorage.getItem(STORAGE.BILLS);
+    const billId = this.state.id;
+    const billRemoved = await RemoveBill(billId);
 
-      if (storagedBills && storagedBills.length > 0) storagedBills = JSON.parse(storagedBills);
-      else return;
-
-      storagedBills = storagedBills.filter(bill => bill.id !== removeBillId);
-      await this.cancelScheduleNotification(removeBillId);
-      await AsyncStorage.setItem(STORAGE.BILLS, JSON.stringify(storagedBills));
-
+    if (billRemoved) {
       this.props.navigation.goBack();
-    } catch (error) {
-      console.log(error);
     }
   };
 

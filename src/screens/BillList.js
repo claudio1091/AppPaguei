@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
-import {
-  AsyncStorage, Image, View, Text,
-} from 'react-native';
+import { Image, View, Text } from 'react-native';
 import { Content, List } from 'native-base';
 
-import moment from 'moment';
 import firebase from 'react-native-firebase';
 
-import { STORAGE } from '../constants';
+import { GetBills } from '../helper/billsHelper';
 import Container from '../components/Container';
 import FabButton from '../components/FabButton';
 import BillItemList from '../components/BillItemList';
@@ -20,7 +17,7 @@ export default class BillList extends Component {
     headerTitle: (
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <Image
-          source={require('../../assets/web_hi_res_512.png')}
+          source={require('../assets/web_hi_res_512.png')}
           style={{ width: 35, height: 35 }}
         />
         <Text style={{ color: 'white', fontSize: 25, marginLeft: 10 }}>
@@ -32,13 +29,15 @@ export default class BillList extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { bills: [], notification: {} };
     const _this = this;
+    this.state = {
+      bills: [],
+    };
 
-    willFocusSubscription = this.props.navigation.addListener('willFocus', () => _this.getFromStorage());
+    willFocusSubscription = this.props.navigation.addListener('willFocus', () => _this.getBills());
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.notificationDisplayedListener = firebase
       .notifications()
       .onNotificationDisplayed((notification) => {
@@ -64,54 +63,25 @@ export default class BillList extends Component {
     this.notificationListener();
   }
 
-  getFromStorage = async () => {
-    try {
-      let billsStoraged = await AsyncStorage.getItem(STORAGE.BILLS);
-
-      console.log('billsStoraged ->', billsStoraged);
-      if (billsStoraged) {
-        billsStoraged = JSON.parse(billsStoraged);
-
-        console.log('billsStoraged parsed ->', billsStoraged);
-        billsStoraged.sort((bill1, bill2) => {
-          const momentA = moment(bill1.dueDate);
-          const momentB = moment(bill2.dueDate);
-          if (momentA > momentB) return 1;
-          if (momentA < momentB) return -1;
-          return 0;
-        });
-      }
-
-      console.log('bills storage ->', billsStoraged);
-
-      this.setState({ bills: billsStoraged });
-      return billsStoraged;
-    } catch (error) {
-      console.log('error storage');
-      console.log(error);
-      return [];
-    }
-  };
-
-  navigateToDetails = () => {
-    this.props.navigation.navigate('BillsDetailScrn');
+  getBills = async () => {
+    const bills = await GetBills(true);
+    this.setState({ bills });
   };
 
   render() {
-    if (!this.state.bills) {
-      this.state.bills = [];
-    }
-
+    const { bills } = this.state;
     const Banner = firebase.admob.Banner;
     const AdRequest = firebase.admob.AdRequest;
     const request = new AdRequest();
     request.addKeyword('foobar');
 
+    console.log(bills);
+
     return (
       <Container>
         <Content>
           <List>
-            {this.state.bills.map(billObj => (
+            {bills.map(billObj => (
               <BillItemList
                 key={billObj.id}
                 navigation={this.props.navigation}

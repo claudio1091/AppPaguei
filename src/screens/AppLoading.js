@@ -1,26 +1,59 @@
 import React, { Component } from 'react';
 import {
   ActivityIndicator,
-  AsyncStorage,
   Dimensions,
   Image,
   StyleSheet,
   View,
+  Text,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import firebase from 'react-native-firebase';
 
-import { THEME, STORAGE } from '../constants';
+import { UpdateBillsDueDate } from '../helper/billsHelper';
+import { THEME } from '../constants';
+
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    backgroundColor: THEME.FONT_COLOR,
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
+});
 
 class AppLoading extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = { msg: '' };
+  }
+
   async componentDidMount() {
     await this.bootstrapAsync();
   }
 
   // Fetch the token from storage then navigate to our appropriate place
   bootstrapAsync = async () => {
-    try {
-      /* const userToken = await AsyncStorage.getItem('USER_TOKEN');
+    this.setState({ msg: 'Criando canal de notificações...' });
+    // Build a channel
+    const channel = new firebase.notifications.Android.Channel(
+      'paguei-channel',
+      'Paguei Channel',
+      firebase.notifications.Android.Importance.Max,
+    ).setDescription('Paguei App channel');
+
+    // Create the channel
+    firebase.notifications().android.createChannel(channel);
+
+    this.setState({ msg: 'Garantindo permissões de notificações...' });
+    await this.grantNotificationPermission();
+    this.setState({ msg: 'Atualizando contas...' });
+    await UpdateBillsDueDate();
+    this.props.navigation.navigate('RootStack');
+
+    /* const userToken = await AsyncStorage.getItem('USER_TOKEN');
 
       if (!userToken) {
         const FCM = firebase.messaging();
@@ -34,17 +67,7 @@ class AppLoading extends Component {
         );
       } */
 
-      // Build a channel
-      const channel = new firebase.notifications.Android.Channel(
-        'paguei-channel',
-        'Paguei Channel',
-        firebase.notifications.Android.Importance.Max,
-      ).setDescription('Paguei App channel');
-
-      // Create the channel
-      firebase.notifications().android.createChannel(channel);
-
-      /* firebase
+    /* firebase
         .firestore()
         .collection('config')
         .doc('default')
@@ -56,18 +79,10 @@ class AppLoading extends Component {
           );
         }); */
 
-      /* await AsyncStorage.setItem(
+    /* await AsyncStorage.setItem(
         STORAGE.BILL_TYPE,
         JSON.stringify(listBillType.get('billType')),
       ); */
-
-      await this.grantNotificationPermission();
-
-      this.props.navigation.navigate('RootStack');
-    } catch (error) {
-      console.log('error storage');
-      console.log(error);
-    }
   };
 
   logInAnonymous = async () => {
@@ -91,27 +106,18 @@ class AppLoading extends Component {
     return (
       <View style={styles.container}>
         <Image
-          source={require('../../assets/web_hi_res_512.png')}
+          source={require('../assets/web_hi_res_512.png')}
           style={{
-            width: Dimensions.get('window').width / 2,
-            height: Dimensions.get('window').width / 2,
+            width: Dimensions.get('window').width / 3,
+            height: Dimensions.get('window').width / 3,
           }}
         />
         <ActivityIndicator size="large" />
+        <Text>{this.state.msg}</Text>
       </View>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    backgroundColor: THEME.FONT_COLOR,
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-});
 
 AppLoading.propTypes = {
   navigation: PropTypes.object.isRequired,
