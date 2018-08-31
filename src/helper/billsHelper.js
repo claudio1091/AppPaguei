@@ -70,9 +70,6 @@ export const PersistBill = async (bill) => {
   try {
     const formValid = validateForm(bill);
 
-    console.log('bill ->', bill);
-    console.log('formValid ->', formValid);
-
     const billSave = Object.assign({}, bill);
     billSave.value = billSave.value
       .toString()
@@ -129,11 +126,9 @@ export const RemoveBill = async (billId) => {
 
 export const UpdateBillsDueDate = async () => {
   try {
-    console.log('getting bills');
     const storageBills = await GetBills();
 
     if (storageBills.length > 0) {
-      console.log(storageBills);
       const updatedBills = storageBills.map((bill) => {
         if (bill.repeat && moment(bill.dueDate) < moment()) {
           // update bill due date

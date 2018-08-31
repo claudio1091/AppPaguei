@@ -106,7 +106,7 @@ class AppLoading extends Component {
     return (
       <View style={styles.container}>
         <Image
-          source={require('../assets/web_hi_res_512.png')}
+          source={{ uri: 'asset:/web_hi_res_512.png' }}
           style={{
             width: Dimensions.get('window').width / 3,
             height: Dimensions.get('window').width / 3,

@@ -38,18 +38,10 @@ export default class BillList extends Component {
   }
 
   async componentDidMount() {
-    this.notificationDisplayedListener = firebase
-      .notifications()
-      .onNotificationDisplayed((notification) => {
-        // Process your notification as required
-        // ANDROID: Remote notifications do not contain the channel ID. You will have to specify this manually if you'd like to re-display the notification.
-        console.log('notification ->', notification);
-      });
     this.notificationListener = firebase
       .notifications()
       .onNotification((notification) => {
         // Process your notification as required
-        console.log('notification ->', notification);
         firebase.notifications().displayNotification(notification);
       });
   }
@@ -74,8 +66,6 @@ export default class BillList extends Component {
     const AdRequest = firebase.admob.AdRequest;
     const request = new AdRequest();
     request.addKeyword('foobar');
-
-    console.log(bills);
 
     return (
       <Container>

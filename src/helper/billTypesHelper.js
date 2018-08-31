@@ -10,8 +10,6 @@ export const BILL_TYPE_MODEL = {
 };
 
 export const GetBillTypesFromFirebase = async () => {
-  console.log('Get BillTypes from Firebase');
-
   const billTypes = await firebase
     .firestore()
     .collection('config')
